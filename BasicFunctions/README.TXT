@@ -1,0 +1,1 @@
+This folder contains basic PowerCLI scripts. All items in this repository are still development and are not recommended for use outside of a lab. 
