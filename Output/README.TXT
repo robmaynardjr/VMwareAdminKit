@@ -1,0 +1,1 @@
+This folder will be the default location for any output files. Look here for any reports or .CSV files here if you cannot find them or did not explicitly set them. 
