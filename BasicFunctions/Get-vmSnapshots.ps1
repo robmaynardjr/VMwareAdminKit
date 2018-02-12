@@ -14,7 +14,7 @@
 .EXAMPLE
    Coming soon.
 .NOTES
-    Version 0.2-DEV(2-11-18)
+    Version 0.2-DEV(2-11-18) REV 001
     Last Edit: 2-11-18 RM
     Created by Rob Maynard Jr.
     February 9, 2018
@@ -64,9 +64,9 @@ function Get-vmSnapShots
                    Position=2,ParameterSetName='1')]
                 
         [string]
-        $OuputPath
+        $OuputPath,
 
-        <#
+        
         #PARAMETER SET 2 (Credentials)
         # Set Username and password to use
         [Parameter(Mandatory=$false,
@@ -80,7 +80,7 @@ function Get-vmSnapShots
 
         [string]
         $Pass
-        #>       
+               
     )
 
     #Validate PowerCLI and PS versions, Connect to vCenter Servers
@@ -129,22 +129,25 @@ function Get-vmSnapShots
     {
         Clear-Host
         if ($OuputPath -eq $null) {
-            $OuputPath = $instPath + "\Output\SnapshotReport." + $OutputType
+            $OuputPath = $instPath + "\Output\SnapshotReport." + $OutputType            
         }
         if ($OuputType -eq 'html') {            
             $CSS = '@"' + (Get-Content "$instPath\Data\report-style.css") + '"@'
             $reportInfo = $vcSnapshotArray | ConvertTo-Html -Fragment
             $body = "<h2>Snapshot report</h2><br><br>$reportInfo<br><br>"
             ConvertTo-Html -PreContent $CSS -Title "Snapshot Report" -Head "<h1>Snapshot Report for $vCenter</h1>" -Body $body | Out-File $OuputPath
+            Write-Host "SnapshotReport.$OutputType saved to $OuputPath"
             $vcSnapshotArray            
         }
         elseif ($OuputType -eq 'csv') {
             $vcSnapshotArray | Export-Csv -Path $OuputPath -Append -NoTypeInformation
             $vcSnapshotArray 
+            Write-Host "SnapshotReport.$OutputType saved to $OuputPath"
         }
         elseif  ($OuputType -eq 'txt'){
             $vcSnapshotArray | Out-File -FilePath $OutputPath
-            $vcSnapshotArray 
+            $vcSnapshotArray
+            Write-Host "SnapshotReport.$OutputType saved to $OuputPath"
         }
         else {
             $vcSnapshotArray
