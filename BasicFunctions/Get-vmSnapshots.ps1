@@ -14,7 +14,7 @@
 .EXAMPLE
    Coming soon.
 .NOTES
-    Version 0.1
+    Version 0.2-DEV(2-11-18)
     Created by Rob Maynard Jr.
     February 9, 2018
 
@@ -22,7 +22,7 @@
               VMware PowerCLI 6.5.0+  
 #>
 function Get-vmSnapShots
-{
+{    
     [CmdletBinding(DefaultParameterSetName='0')]
     [Alias("gvmss")]
 
@@ -55,7 +55,15 @@ function Get-vmSnapShots
         [ValidateSet("csv", "html", "txt")]
 
         [string]
-        $OuputType
+        $OuputType,
+
+        [Parameter(Mandatory=$false,
+                    ValueFromPipeline=$true,
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=2,ParameterSetName='1')]
+                
+        [string]
+        $OuputPath
 
         <#
         #PARAMETER SET 2 (Credentials)
@@ -76,7 +84,8 @@ function Get-vmSnapShots
 
     #Validate PowerCLI and PS versions, Connect to vCenter Servers
     Begin
-    {
+    {   
+        $SCRIPT:instPath = "F:\Code\Repositories\VMwareAdminKit"
         Get-Module -ListAvailable VM* | Import-Module
         $PcliVer = Get-Module VMware.VimAutomation.Core | Select-Object 
         if ($PcliVer.Version.Major -ge 6 -and $PcliVer.Version.Minor -ge 5 -and $PSVersionTable.PSVersion.Major -ge 5) {
@@ -117,6 +126,27 @@ function Get-vmSnapShots
     #Output, Display Reports and Close Connections
     End
     {
-        $vcSnapshotArray
+        if ($OuputPath -eq $null) {
+            $OuputPath = $instPath + "\Output\SnapshotReport." + $OutputType
+        }
+        if ($OuputType -eq 'html') {            
+            $CSS = '@"' + (Get-Content "$instPath\Data\report-style.css") + '"@'
+            $reportInfo = $vcSnapshotArray | ConvertTo-Html -Fragment
+            $body = "<h2>Snapshot report</h2><br><br>$reportInfo<br><br>"
+            ConvertTo-Html -PreContent $CSS -Title "Snapshot Report" -Head "<h1>Snapshot Report for $vCenter</h1>" -Body $body | Out-File $OuputPath
+            $vcSnapshotArray            
+        }
+        elseif ($OuputType -eq 'csv') {
+            $vcSnapshotArray | Export-Csv -Path $OuputPath -Append -NoTypeInformation
+            $vcSnapshotArray 
+        }
+        elseif  ($OuputType -eq 'txt'){
+            $vcSnapshotArray | Out-File -FilePath $OutputPath
+            $vcSnapshotArray 
+        }
+        else {
+            $vcSnapshotArray
+        }
+
     }
 }
