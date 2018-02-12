@@ -15,6 +15,7 @@
    Coming soon.
 .NOTES
     Version 0.2-DEV(2-11-18)
+    Last Edit: 2-11-18 RM
     Created by Rob Maynard Jr.
     February 9, 2018
 
@@ -126,6 +127,7 @@ function Get-vmSnapShots
     #Output, Display Reports and Close Connections
     End
     {
+        Clear-Host
         if ($OuputPath -eq $null) {
             $OuputPath = $instPath + "\Output\SnapshotReport." + $OutputType
         }
@@ -148,5 +150,6 @@ function Get-vmSnapShots
             $vcSnapshotArray
         }
 
+        Disconnect-VIServer $vCenter -Force -InformationAction SilentlyContinue -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
     }
 }
